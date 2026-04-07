@@ -1,0 +1,74 @@
+name: "Notify"
+description: "Send CI status notifications via Slack, email, and GitHub PR comment"
+
+inputs:
+  status:
+    description: "'success' or 'failure'"
+    required: true
+  workflow_name:
+    description: "Name of the workflow"
+    required: true
+  run_url:
+    description: "URL to the workflow run"
+    required: true
+
+  # Slack
+  slack_webhook_url:
+    description: "Slack Incoming Webhook URL (leave empty to skip)"
+    required: false
+    default: ""
+
+  # Email (Gmail App Password or SMTP)
+  email_to:
+    description: "Recipient email address (leave empty to skip)"
+    required: false
+    default: ""
+  email_from:
+    description: "Sender email address"
+    required: false
+    default: ""
+  email_password:
+    description: "App password for the sender account"
+    required: false
+    default: ""
+
+  # GitHub PR comment
+  github_token:
+    description: "GITHUB_TOKEN for posting PR comments"
+    required: false
+    default: ""
+  pr_number:
+    description: "Pull request number (leave empty to skip)"
+    required: false
+    default: ""
+  repository:
+    description: "owner/repo (e.g. KK6364/zip-ci-assignment)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install notify dependencies
+      shell: bash
+      run: pip install requests PyGithub
+
+    - name: Run notifier
+      shell: bash
+      env:
+        NOTIFY_STATUS: ${{ inputs.status }}
+        NOTIFY_WORKFLOW: ${{ inputs.workflow_name }}
+        NOTIFY_RUN_URL: ${{ inputs.run_url }}
+        SLACK_WEBHOOK_URL: ${{ inputs.slack_webhook_url }}
+        EMAIL_TO: ${{ inputs.email_to }}
+        EMAIL_FROM: ${{ inputs.email_from }}
+        EMAIL_PASSWORD: ${{ inputs.email_password }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        REPOSITORY: ${{ inputs.repository }}
+      run: python ${{ github.action_path }}/notify.py
