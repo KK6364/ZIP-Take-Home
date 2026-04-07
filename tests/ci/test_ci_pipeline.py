@@ -17,7 +17,7 @@ import pytest
 import requests
 from github import Auth, Github, GithubException
 
-REPO_NAME = "KK6364/zip-ci-assignment"
+REPO_NAME = "KK6364/ZIP-Take-Home"
 MAIN_BRANCH = "main"
 REQUIRED_WORKFLOW_FILE = ".github/workflows/ci.yml"
 REQUIRED_JOBS = {"lint", "test", "notify"}
