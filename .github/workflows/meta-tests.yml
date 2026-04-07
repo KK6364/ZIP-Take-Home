@@ -1,0 +1,27 @@
+name: CI Meta-Tests
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # every night at midnight UTC
+  workflow_dispatch:       # allow manual trigger from GitHub UI
+
+jobs:
+  meta-tests:
+    name: Verify CI Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dev dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run meta-tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.META_TEST_PAT }}
+        run: pytest tests/ci/test_ci_pipeline.py -v
