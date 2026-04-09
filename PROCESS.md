@@ -61,7 +61,7 @@ CI runs again on the PR
 | Required PR approvals | 1 |
 | Stale review dismissal | Enabled — new commits invalidate prior approvals |
 | Required status checks | `Lint (flake8)` and `Unit Tests (pytest)` must pass |
-| Allowed merge methods | Squash and rebase only (no merge commits) |
+| Allowed merge methods | Squash and rebase only — disabled at both ruleset and repo level |
 | Force push | Blocked |
 
 ---
@@ -136,11 +136,15 @@ Each channel is **opt-in via secrets**. If a secret is not set, that channel is 
 
 ## Running the Meta-Tests
 
-The `tests/ci/` directory contains tests that verify the pipeline configuration itself via the GitHub API. They are excluded from the normal CI run and must be run manually.
+The `tests/ci/` directory contains tests that verify the pipeline configuration itself via the GitHub API. They are excluded from the normal CI run.
 
+### Automated (nightly)
+A scheduled workflow (`.github/workflows/meta-tests.yml`) runs `pytest tests/ci/test_ci_pipeline.py` every night at midnight UTC using a PAT stored as the `META_TEST_PAT` secret. It can also be triggered manually from the GitHub Actions tab via `workflow_dispatch`.
+
+### Manual
 ```bash
 export GITHUB_TOKEN=<pat_with_repo_scope>
 pytest tests/ci/test_ci_pipeline.py -v
 ```
 
-These should be re-run after any changes to the ruleset or workflow file.
+Re-run manually after any changes to the ruleset or workflow file.
